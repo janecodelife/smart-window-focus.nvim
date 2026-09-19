@@ -26,10 +26,8 @@ require("smart-window-focus").setup({
 
 Add the following to your `init.lua` or `keymaps.lua` file:
 
-```lua
 -- Toggle smart window focus on and off using your preferred shortcut
 vim.keymap.set("n", "<leader>ft", "<cmd>SmartWindowFocusToggle<cr>", { desc = "Toggle Smart Window Focus" })
-```
 ```
 
 ## ⚙️ Configuration
@@ -43,15 +41,8 @@ You can customize the plugin by passing options into the `setup()` function:
 
 ## 🎮 Keymaps & Commands
 
-The plugin assigns a default global keymap sequence for easy toggling:
-
-- **`<leader>ft`**: Toggles the smart focusing on and off. When disabled, windows immediately return to Neovim's default equal layout.
-
-### User Commands
-
-You can also control the plugin behavior directly from the command-line mode:
-
 - `:SmartWindowFocusToggle` - Toggle the auto-resizing state.
 - `:SmartWindowFocusEnable` - Turn on smart resizing behavior.
 - `:SmartWindowFocusDisable` - Turn off smart resizing and revert to default balanced layout.
 
+# Thank You
