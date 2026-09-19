@@ -10,7 +10,7 @@ M.config = {
 local augroup = vim.api.nvim_create_augroup("SmartWindowFocus", { clear = true })
 local autocmd_id = nil
 
--- Function to resize the currently focused window horizontally
+-- Function to resize all windows explicitly to ensure equal distribution of remaining space
 local function resize_windows()
 	-- 1. Ensure the current window is a normal layout window (not floating)
 	local win_config = vim.api.nvim_win_get_config(0)
@@ -23,37 +23,47 @@ local function resize_windows()
 		return
 	end
 
-	-- 3. Gather and count only regular file split windows in the current tabpage
+	-- 3. Gather all valid normal split windows in the current tabpage
 	local windows = vim.api.nvim_tabpage_list_wins(0)
-	local normal_splits_count = 0
+	local normal_windows = {}
 
 	for _, win in ipairs(windows) do
 		local cfg = vim.api.nvim_win_get_config(win)
 		local buf = vim.api.nvim_win_get_buf(win)
 		local buftype = vim.api.nvim_get_option_value("buftype", { buf = buf })
 
-		-- Count window only if it is non-floating and hosts a standard text file
+		-- Store window only if it is non-floating and hosts a standard text file
 		if cfg.relative == "" and buftype == "" then
-			normal_splits_count = normal_splits_count + 1
+			table.insert(normal_windows, win)
 		end
 	end
 
 	-- If there is only one normal text file open, keep it full screen and exit
+	local normal_splits_count = #normal_windows
 	if normal_splits_count <= 1 then
 		return
 	end
 
-	-- 4. Equalize layouts horizontally first so remaining splits distribute evenly
-	vim.cmd("wincmd =")
-
 	-- Get total width dimensions of Neovim screen
 	local total_width = vim.o.columns
+	local current_win = vim.api.nvim_get_current_win()
 
-	-- Calculate targeted width using user-defined scale percentage
+	-- Calculate targeted width for the focused window
 	local target_width = math.floor(total_width * M.config.width_percentage)
 
-	-- Safely apply width dimension to the active split window (height is untouched)
-	pcall(vim.api.nvim_win_set_width, 0, target_width)
+	-- Calculate the remaining width to be shared among non-focused windows
+	local remaining_width = total_width - target_width
+	local other_win_count = normal_splits_count - 1
+	local other_width = math.floor(remaining_width / other_win_count)
+
+	-- 4. Explicitly loop and set the width for every single window to prevent layout collapse
+	for _, win in ipairs(normal_windows) do
+		if win == current_win then
+			pcall(vim.api.nvim_win_set_width, win, target_width)
+		else
+			pcall(vim.api.nvim_win_set_width, win, other_width)
+		end
+	end
 end
 
 -- Function to enable the smart focusing behavior
@@ -116,4 +126,5 @@ function M.setup(opts)
 	end
 end
 
+-- Return the module
 return M
