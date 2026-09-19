@@ -1,17 +1,16 @@
 local M = {}
 
--- Default configuration options
+-- Default configuration options (Strictly focused on width for vertical splits)
 M.config = {
 	enabled = true, -- Enable the plugin automatically on startup
 	width_percentage = 0.65, -- Width percentage for the focused window (65%)
-	height_percentage = 0.65, -- Height percentage for the focused window (65%)
 }
 
 -- Internal tracking for the autocommand group and ID
 local augroup = vim.api.nvim_create_augroup("SmartWindowFocus", { clear = true })
 local autocmd_id = nil
 
--- Function to resize the currently focused window based on configured percentages
+-- Function to resize the currently focused window horizontally
 local function resize_windows()
 	-- 1. Ensure the current window is a normal layout window (not floating)
 	local win_config = vim.api.nvim_win_get_config(0)
@@ -20,7 +19,6 @@ local function resize_windows()
 	end
 
 	-- 2. Strictly target normal layout buffers (buftype must be empty for normal files)
-	-- This automatically skips terminals, prompts, quickfix, and custom plugin windows
 	if vim.bo.buftype ~= "" then
 		return
 	end
@@ -45,20 +43,17 @@ local function resize_windows()
 		return
 	end
 
-	-- 4. Equalize layouts first so remaining splits distribute evenly without hiding
+	-- 4. Equalize layouts horizontally first so remaining splits distribute evenly
 	vim.cmd("wincmd =")
 
-	-- Get total screen dimensions of Neovim
+	-- Get total width dimensions of Neovim screen
 	local total_width = vim.o.columns
-	local total_height = vim.o.lines - 2 -- Subtract command line and statusline height
 
-	-- Calculate targeted dimensions using user-defined scale percentages
+	-- Calculate targeted width using user-defined scale percentage
 	local target_width = math.floor(total_width * M.config.width_percentage)
-	local target_height = math.floor(total_height * M.config.height_percentage)
 
-	-- Safely apply dimensions to the active split window
+	-- Safely apply width dimension to the active split window (height is untouched)
 	pcall(vim.api.nvim_win_set_width, 0, target_width)
-	pcall(vim.api.nvim_win_set_height, 0, target_height)
 end
 
 -- Function to enable the smart focusing behavior
@@ -75,9 +70,9 @@ function M.enable()
 			end,
 		})
 	end
-	-- Trigger instant calculation check
+	-- Trigger instant width calculation check
 	resize_windows()
-	print("Smart Window Focus: ENABLED")
+	print("Smart Window Focus: ENABLED (V-Splits Only)")
 end
 
 -- Function to disable the smart focusing and restore default Neovim layout
