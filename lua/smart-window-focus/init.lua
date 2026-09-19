@@ -117,14 +117,10 @@ function M.setup(opts)
 	vim.api.nvim_create_user_command("SmartWindowFocusDisable", M.disable, {})
 	vim.api.nvim_create_user_command("SmartWindowFocusToggle", M.toggle, {})
 
-	-- Map the toggle command to global shortcut sequence
-	vim.keymap.set("n", "<leader>ft", M.toggle, { desc = "Toggle Smart Window Focus" })
-
 	-- Run on startup if configured to true
 	if M.config.enabled then
 		M.enable()
 	end
 end
 
--- Return the module
 return M

@@ -1,8 +1,7 @@
 # smart-window-focus.nvim
 
-A lightweight, high-performance, and native Neovim plugin written in Lua that automatically resizes your active vertical split (`vsplit`) to a comfortable viewing width while keeping all other non-focused splits perfectly balanced and equalized.
+A lightweight, high-performance, and native Neovim plugin written in Lua that automatically resizes your active vertical split (`vsplit`) to a comfortable viewing
 
-Unlike other window layout plugins, **smart-window-focus.nvim** treats custom layouts dynamically. It strictly focuses on standard text code files and completely ignores floating windows, Telescope prompts, terminals, and tree-explorers by default to ensure zero conflicts with your existing config.
 
 ## 🚀 Features
 
@@ -24,6 +23,13 @@ require("smart-window-focus").setup({
     width_percentage = 0.65, -- Resize focused window to take 65% of screen width
     enabled = true,          -- Enable the plugin automatically on startup
 })
+
+Add the following to your `init.lua` or `keymaps.lua` file:
+
+```lua
+-- Toggle smart window focus on and off using your preferred shortcut
+vim.keymap.set("n", "<leader>ft", "<cmd>SmartWindowFocusToggle<cr>", { desc = "Toggle Smart Window Focus" })
+```
 ```
 
 ## ⚙️ Configuration
