@@ -13,6 +13,14 @@ local autocmd_id = nil
 
 -- Function to resize the currently focused window based on configured percentages
 local function resize_windows()
+	-- Get all valid windows in the current tabpage
+	local windows = vim.api.nvim_tabpage_list_wins(0)
+
+	-- If only one window is open, do not resize it (keep it full screen)
+	if #windows <= 1 then
+		return
+	end
+
 	-- Get total layout dimensions of Neovim
 	local total_width = vim.o.columns
 	local total_height = vim.o.lines - 2 -- Subtract command line and statusline height
@@ -40,9 +48,9 @@ function M.enable()
 			end,
 		})
 	end
-	-- Instantly resize the current window upon enablement
+	-- Apply resize only if there are multiple splits already present
 	resize_windows()
-	print("Smart Focus: ENABLED")
+	print("Smart Window Focus: ENABLED")
 end
 
 -- Function to disable the smart focusing and restore default Neovim layout
@@ -55,7 +63,7 @@ function M.disable()
 	end
 	-- Reset all split sizes equally (default Neovim behavior)
 	vim.cmd("wincmd =")
-	print("Smart Focus: DISABLED (Normal Neovim)")
+	print("Smart Window Focus: DISABLED (Normal Neovim)")
 end
 
 -- Function to toggle between enabled and disabled states
@@ -78,7 +86,7 @@ function M.setup(opts)
 	vim.api.nvim_create_user_command("SmartWindowFocusToggle", M.toggle, {})
 
 	-- Bind default keymap for fast toggling
-	vim.keymap.set("n", "<leader>ft", M.toggle, { desc = "Toggle Smart Focus" })
+	vim.keymap.set("n", "<leader>ft", M.toggle, { desc = "Toggle Smart Window Focus" })
 
 	-- Trigger initial enablement if true
 	if M.config.enabled then
